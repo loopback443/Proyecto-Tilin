@@ -1,0 +1,60 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión</title>
+    <link rel="stylesheet" href="{% static 'cuentas/estilos.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="login_container">
+            <div class="login_tittle">
+                <span>Inicio de Sesión</span>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="error-message">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="input_wrapper">
+                    <input type="email" name="email" class="input_field" placeholder="Correo electrónico" required>
+                    <label class="label">Correo</label>
+                    <i class="fa-regular fa-envelope icon"></i>
+                </div>
+
+                <div class="input_wrapper">
+                    <input type="password" name="password" class="input_field" placeholder="Contraseña" required>
+                    <label class="label">Contraseña</label>
+                    <i class="fa-solid fa-lock icon"></i>
+                </div>
+
+                <div class="remember-forgot">
+                    <div>
+                        <input type="checkbox" id="remember">
+                        <label for="remember">Recordar sesión</label>
+                    </div>
+                    <div>
+                        <a href="#">¿Olvidaste tu contraseña?</a>
+                    </div>
+                </div>
+
+                <div class="input_wrapper">
+                    <input type="submit" class="input-submit" value="Iniciar Sesión">
+                </div>
+            </form>
+
+            <div class="signup">
+                <span>¿No tienes una cuenta? <a href="{% url 'register' %}">Regístrate</a></span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
