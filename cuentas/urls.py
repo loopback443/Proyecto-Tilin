@@ -12,3 +12,10 @@ urlpatterns = [
     path('logout/', logout_view, name='logout'),    # Cerrar sesión
     path('register/', register_view, name='register')  # Registro de nuevos usuarios
 ]
+
+
+from .views import hacer_reserva, mis_reservas
+urlpatterns += [
+    path('reservar/', hacer_reserva, name='hacer_reserva'),
+    path('mis-reservas/', mis_reservas, name='mis_reservas'),
+]
