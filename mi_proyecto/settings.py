@@ -1,20 +1,20 @@
 from pathlib import Path
-import os  # Necesario para manejar rutas
+import os
 from decouple import config
 
+# =============================
+# CONFIGURACIÓN GENERAL
+# =============================
 
-# Base directory
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-# Clave secreta para Django (mantenela en secreto en producción)
 SECRET_KEY = config('SECRET_KEY')
-
-
-# Modo de desarrollo
 DEBUG = True
 ALLOWED_HOSTS = []
 
-# Aplicaciones instaladas
+# =============================
+# APLICACIONES INSTALADAS
+# =============================
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -22,10 +22,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'cuentas',  # Tu app personalizada
+    'cuentas',
 ]
 
-# Middleware
+# =============================
+# MIDDLEWARE
+# =============================
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -36,10 +39,16 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# Enrutador principal
+# =============================
+# RUTEO
+# =============================
+
 ROOT_URLCONF = 'mi_proyecto.urls'
 
-# Configuración de templates
+# =============================
+# TEMPLATES
+# =============================
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -56,16 +65,22 @@ TEMPLATES = [
     },
 ]
 
+# =============================
 # WSGI
+# =============================
+
 WSGI_APPLICATION = 'mi_proyecto.wsgi.application'
 
-# 🔧 Configuración de base de datos: SQL Server Express + autenticación de Windows
+# =============================
+# BASE DE DATOS
+# =============================
+
 DATABASES = {
     'default': {
         'ENGINE': 'mssql',
         'NAME': 'GourmetDB',
         'HOST': 'localhost\\SQLEXPRESS',
-        'PORT': '',
+        'PORT': None,  # <- CORREGIDO
         'OPTIONS': {
             'driver': 'ODBC Driver 17 for SQL Server',
             'trusted_connection': 'yes',
@@ -73,37 +88,38 @@ DATABASES = {
     }
 }
 
-# Validadores de contraseña
+# =============================
+# VALIDACIÓN DE CONTRASEÑAS
+# =============================
+
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-# Configuración regional
+# =============================
+# LOCALIZACIÓN
+# =============================
+
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Archivos estáticos
+# =============================
+# ARCHIVOS ESTÁTICOS
+# =============================
+
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'cuentas', 'static')]
 
-# Campo automático por defecto
+# =============================
+# CONFIG. AVANZADAS
+# =============================
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# URL para login (si usás @login_required)
 LOGIN_URL = '/login/'
-
 AUTH_USER_MODEL = 'cuentas.CustomUser'
 AUTHENTICATION_BACKENDS = ['cuentas.backend.EmailBackend']

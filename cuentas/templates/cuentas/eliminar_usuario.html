@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="admin-panel">
+    <h2 class="titulo-admin">Eliminar Usuario</h2>
+
+    <div class="form-container">
+        <p>¿Estás seguro de que querés eliminar a <strong>{{ usuario.first_name }} {{ usuario.last_name }}</strong>?</p>
+        <p><strong>Correo:</strong> {{ usuario.email }}</p>
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="acciones">
+                <button type="submit" class="btn-accion eliminar">Sí, eliminar</button>
+                <a href="{% url 'gestionar_usuarios' %}" class="btn-accion editar">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

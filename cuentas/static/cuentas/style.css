@@ -193,3 +193,223 @@ footer {
 .social-icons a:hover {
     color: #e67e22;
 }
+
+/* ===== PANEL ADMIN ===== */
+.btn-admin {
+    display: inline-block;
+    padding: 10px 16px;
+    background-color: #e67e22;
+    color: white;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background 0.3s ease;
+    margin-top: 10px;
+}
+
+.btn-admin:hover {
+    background-color: #d35400;
+}
+
+.admin-panel {
+    max-width: 900px;
+    margin: auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+}
+
+.titulo-admin {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.filtro-form {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    gap: 10px;
+}
+
+.filtro-form input,
+.filtro-form select,
+.filtro-form button {
+    padding: 8px;
+    font-size: 14px;
+}
+
+.btn-filtrar {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.tabla-usuarios {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tabla-usuarios th,
+.tabla-usuarios td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: left;
+}
+
+.success-message {
+    color: green;
+    margin-bottom: 15px;
+}
+
+.no-action {
+    color: gray;
+    font-size: 0.9em;
+}
+
+/* ===== BOTONES DE ACCIONES ===== */
+.acciones {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.btn-accion {
+    padding: 4px 10px;
+    border-radius: 14px;
+    text-decoration: none;
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: white;
+    transition: background 0.3s ease;
+    border: none;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.btn-accion.editar {
+    background-color: #3498db;
+}
+
+.btn-accion.editar:hover {
+    background-color: #2980b9;
+}
+
+.btn-accion.eliminar {
+    background-color: #e74c3c;
+}
+
+.btn-accion.eliminar:hover {
+    background-color: #c0392b;
+}
+.sidebar-admin {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 200px;
+    height: 100%;
+    background-color: #2c3e50;
+    padding: 20px;
+    color: white;
+    z-index: 10;
+}
+
+.sidebar-admin h3 {
+    margin-bottom: 20px;
+    font-size: 1.2rem;
+    color: #e67e22;
+}
+
+.sidebar-admin ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar-admin ul li {
+    margin-bottom: 15px;
+}
+
+.sidebar-admin ul li a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.sidebar-admin ul li a:hover {
+    color: #e67e22;
+}
+.admin-main {
+    margin-left: 220px;
+    padding: 20px;
+}
+
+.normal-main {
+    padding: 20px;
+}
+
+.admin-footer {
+    margin-left: 220px;
+    text-align: center;
+    padding: 20px;
+}
+
+.normal-footer {
+    margin-left: 0;
+    text-align: center;
+    padding: 20px;
+}
+.tabla-container {
+    overflow-x: auto;
+    margin-top: 20px;
+}
+
+.tabla-reservas {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    font-size: 0.95rem;
+    text-align: center;
+}
+
+.tabla-reservas th {
+    background-color: #e67e22;
+    color: white;
+    padding: 12px;
+}
+
+.tabla-reservas td {
+    padding: 10px;
+    border-bottom: 1px solid #f0f0f0;
+    white-space: nowrap;
+}
+
+.tabla-reservas tr:last-child td {
+    border-bottom: none;
+}
+
+.tabla-reservas tr:hover {
+    background-color: #fdf4ec;
+}
+
+.btn-accion.eliminar {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 14px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    text-decoration: none;
+    transition: 0.2s ease-in-out;
+    display: inline-block;
+}
+
+.btn-accion.eliminar:hover {
+    background-color: #c0392b;
+    transform: scale(1.05);
+}

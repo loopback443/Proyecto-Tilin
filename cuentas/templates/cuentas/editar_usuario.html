@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="admin-panel">
+    <h2 class="titulo-admin">Editar Rol de Usuario</h2>
+
+    <div class="form-container">
+        <p><strong>Nombre:</strong> {{ usuario.first_name }} {{ usuario.last_name }}</p>
+        <p><strong>Correo:</strong> {{ usuario.email }}</p>
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="rol">Rol:</label>
+                <select name="rol" id="rol">
+                    <option value="cliente" {% if usuario.rol == "cliente" %}selected{% endif %}>Cliente</option>
+                    <option value="recepcionista" {% if usuario.rol == "recepcionista" %}selected{% endif %}>Recepcionista</option>
+                    <option value="admin" {% if usuario.rol == "admin" %}selected{% endif %}>Administrador</option>
+                </select>
+            </div>
+
+            <div class="acciones">
+                <button type="submit" class="btn-accion editar">Guardar</button>
+                <a href="{% url 'gestionar_usuarios' %}" class="btn-accion eliminar">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
