@@ -1,0 +1,11 @@
+{% if request.user.is_authenticated and request.user.rol == "admin" %}
+<aside class="sidebar-admin">
+    <h3>Panel Admin</h3>
+    <ul>
+        <li><a href="{% url 'gestionar_usuarios' %}">Gestionar Usuarios</a></li>
+        <li><a href="{% url 'ver_todas_las_reservas' %}">Ver Reservas</a></li>
+        <li><a href="{% url 'inicio' %}">Ir al Inicio</a></li>
+        <li><a href="{% url 'logout' %}">Cerrar sesión</a></li>
+    </ul>
+</aside>
+{% endif %}

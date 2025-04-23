@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="admin-panel">
+    <h2 class="titulo-admin">Todas las Reservas</h2>
+
+    <!-- Filtros -->
+    <form method="get" class="filtro-form">
+        <input type="text" name="nombre" placeholder="Buscar por nombre" value="{{ filtro_nombre }}">
+        <input type="text" name="contacto" placeholder="Buscar por contacto" value="{{ filtro_contacto }}">
+        <input type="date" name="fecha" value="{{ filtro_fecha }}">
+        <button type="submit" class="btn-filtrar">Filtrar</button>
+    </form>
+
+    {% if reservas %}
+        <div class="tabla-container">
+            <table class="tabla-reservas">
+                <thead>
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Fecha</th>
+                        <th>Hora</th>
+                        <th>Personas</th>
+                        <th>Motivo</th>
+                        <th>Contacto</th>
+                        <th>Correo</th>
+                        <th>Teléfono</th>
+                        <th>Notas</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reserva in reservas %}
+                    <tr>
+                        <td>{{ reserva.cliente.first_name }} {{ reserva.cliente.last_name }}</td>
+                        <td>{{ reserva.fecha }}</td>
+                        <td>{{ reserva.hora }}</td>
+                        <td>{{ reserva.cantidad_personas }}</td>
+                        <td>{{ reserva.get_motivo_display }}</td>
+                        <td>{{ reserva.nombre_contacto }}</td>
+                        <td>{{ reserva.correo }}</td>
+                        <td>{{ reserva.telefono }}</td>
+                        <td>{{ reserva.notas_adicionales }}</td>
+                        <td>
+                            <a href="{% url 'eliminar_reserva_admin' reserva.id %}" 
+                               class="btn-accion eliminar"
+                               onclick="return confirm('¿Seguro que deseas eliminar esta reserva?')">
+                                Eliminar
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p style="text-align: center;">No hay reservas registradas.</p>
+    {% endif %}
+</div>
+{% endblock %}

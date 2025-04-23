@@ -5,7 +5,12 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 # ==============================
 # MODELO CUSTOMUSER
 # ==============================
+
 class CustomUserManager(BaseUserManager):
+    """
+    Manager personalizado para el modelo CustomUser.
+    """
+
     def create_user(self, email, password=None, **extra_fields):
         if not email:
             raise ValueError("El correo electrónico es obligatorio")
@@ -18,12 +23,24 @@ class CustomUserManager(BaseUserManager):
     def create_superuser(self, email, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('rol', 'admin')  # 👈 Asegura que tenga rol admin
         return self.create_user(email, password, **extra_fields)
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
+    """
+    Modelo de usuario personalizado basado en correo electrónico.
+    """
+
+    ROL_CHOICES = [
+        ('cliente', 'Cliente'),
+        ('recepcionista', 'Recepcionista'),
+        ('admin', 'Administrador'),
+    ]
+
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
+    rol = models.CharField(max_length=20, choices=ROL_CHOICES, default='cliente')  # 👈 Nuevo campo
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
@@ -38,6 +55,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 # ==============================
 # MODELO MESA
 # ==============================
+
 class Mesa(models.Model):
     numero = models.IntegerField(unique=True)
     capacidad = models.IntegerField()
@@ -49,6 +67,7 @@ class Mesa(models.Model):
 # ==============================
 # MODELO RESERVA
 # ==============================
+
 class Reserva(models.Model):
     OPCIONES_MOTIVO = [
         ('cena', 'Cena normal'),

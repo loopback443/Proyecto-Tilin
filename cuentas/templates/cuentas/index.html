@@ -20,7 +20,12 @@
                     <li><a href="{% url 'inicio' %}">Inicio</a></li>
                     <li><a href="#">Menú</a></li>
                     <li><a href="#">Contacto</a></li>
+                    {% if request.user.rol != "admin" %}
                     <li><a href="{% url 'mis_reservas' %}">Mis Reservas</a></li>
+                    {% endif %}
+                    {% if request.user.rol == "admin" %}
+                    <li><a href="{% url 'gestionar_usuarios' %}">Gestionar Restaurante</a></li>
+                    {% endif %}
                 </ul>
             </div>
             <div class="nav-user">
@@ -31,6 +36,8 @@
             </div>
         </nav>
     </header>
+
+    <!-- CONTENIDO DE RESERVAS QUEDA IGUAL -->
 
     <main>
         <section class="hero">
