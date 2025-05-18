@@ -7,10 +7,6 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 # ==============================
 
 class CustomUserManager(BaseUserManager):
-    """
-    Manager personalizado para el modelo CustomUser.
-    """
-
     def create_user(self, email, password=None, **extra_fields):
         if not email:
             raise ValueError("El correo electrónico es obligatorio")
@@ -23,14 +19,11 @@ class CustomUserManager(BaseUserManager):
     def create_superuser(self, email, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
-        extra_fields.setdefault('rol', 'admin')  # 👈 Asegura que tenga rol admin
+        extra_fields.setdefault('rol', 'admin')
         return self.create_user(email, password, **extra_fields)
 
-class CustomUser(AbstractBaseUser, PermissionsMixin):
-    """
-    Modelo de usuario personalizado basado en correo electrónico.
-    """
 
+class CustomUser(AbstractBaseUser, PermissionsMixin):
     ROL_CHOICES = [
         ('cliente', 'Cliente'),
         ('recepcionista', 'Recepcionista'),
@@ -40,7 +33,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
-    rol = models.CharField(max_length=20, choices=ROL_CHOICES, default='cliente')  # 👈 Nuevo campo
+    rol = models.CharField(max_length=20, choices=ROL_CHOICES, default='cliente')
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
@@ -88,6 +81,19 @@ class Reserva(models.Model):
     correo = models.EmailField()
     telefono = models.CharField(max_length=20, blank=True)
     notas_adicionales = models.TextField(blank=True)
+    activa = models.BooleanField(default=True)  # ✅ NUEVO
 
     def __str__(self):
-        return f"Reserva de {self.cliente.email} el {self.fecha} a las {self.hora}"
+        estado = "Activa" if self.activa else "Cancelada"
+        return f"Reserva de {self.cliente.email} el {self.fecha} a las {self.hora} ({estado})"
+
+# ==============================
+# MODELO COMIDA
+# ==============================
+
+class Comida(models.Model):
+    nombre = models.CharField(max_length=100)
+    precio = models.PositiveIntegerField(help_text="Precio en guaraníes")
+
+    def __str__(self):
+        return f"{self.nombre} - Gs. {self.precio}"

@@ -1,16 +1,25 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .forms import ReservaForm, RegistroUsuarioForm
-from .models import Reserva, CustomUser
+from .forms import ReservaForm, RegistroUsuarioForm, ComidaForm
+from .models import Reserva, CustomUser, Comida
 
 # ========================
-# VISTAS DE AUTENTICACIÓN
+# FUNCIONES AUXILIARES
+# ========================
+
+def es_admin(user):
+    return user.is_authenticated and user.rol == 'admin'
+
+def es_admin_o_recepcionista(user):
+    return user.is_authenticated and user.rol in ['admin', 'recepcionista']
+
+# ========================
+# AUTENTICACIÓN
 # ========================
 
 def login_view(request):
-    """Vista para iniciar sesión de usuario."""
     if request.method == 'POST':
         email = request.POST.get("email")
         password = request.POST.get("password")
@@ -18,14 +27,18 @@ def login_view(request):
 
         if user is not None:
             login(request, user)
-            return redirect('inicio')
+            if user.rol == 'admin':
+                return redirect('inicio')
+            elif user.rol == 'recepcionista':
+                return redirect('ver_todas_las_reservas')
+            else:
+                return redirect('inicio')
         else:
             messages.error(request, "Correo o contraseña incorrectos.")
     return render(request, 'cuentas/login.html')
 
 
 def register_view(request):
-    """Vista para registrar un nuevo usuario."""
     if request.method == 'POST':
         form = RegistroUsuarioForm(request.POST)
         if form.is_valid():
@@ -40,24 +53,20 @@ def register_view(request):
 
 
 def logout_view(request):
-    """Cierra la sesión del usuario actual y redirige al login."""
     logout(request)
     return redirect('login')
 
-
 # ========================
-# VISTAS DE USUARIO LOGUEADO
+# CLIENTE: INICIO / RESERVAS
 # ========================
 
 @login_required
 def index_view(request):
-    """Vista principal del sistema para usuarios autenticados."""
     return render(request, 'cuentas/index.html', {'usuario': request.user.first_name})
 
 
 @login_required
 def hacer_reserva(request):
-    """Procesa el formulario de reservas y guarda la reserva del usuario."""
     if request.method == 'POST':
         reserva = Reserva(
             cliente=request.user,
@@ -78,34 +87,50 @@ def hacer_reserva(request):
 
 @login_required
 def mis_reservas(request):
-    """Muestra todas las reservas hechas por el usuario logueado."""
-    reservas = request.user.reserva_set.all()
+    reservas = request.user.reserva_set.filter(activa=True)
     return render(request, 'cuentas/mis_reservas.html', {'reservas': reservas})
 
 
-# ========================
-# VISTAS ADMINISTRADOR
-# ========================
+@login_required
+def editar_reserva(request, reserva_id):
+    reserva = get_object_or_404(Reserva, id=reserva_id, cliente=request.user, activa=True)
 
-def es_admin(user):
-    """Valida si el usuario es administrador."""
-    return user.is_authenticated and user.rol == 'admin'
+    if request.method == 'POST':
+        form = ReservaForm(request.POST, instance=reserva)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Reserva actualizada con éxito.")
+            return redirect('mis_reservas')
+    else:
+        form = ReservaForm(instance=reserva)
 
+    return render(request, 'cuentas/form_reserva.html', {'form': form, 'accion': 'Editar'})
+
+
+@login_required
+def cancelar_reserva(request, reserva_id):
+    reserva = get_object_or_404(Reserva, id=reserva_id, cliente=request.user, activa=True)
+
+    if request.method == 'POST':
+        reserva.activa = False
+        reserva.save()
+        messages.success(request, "Reserva cancelada correctamente.")
+        return redirect('mis_reservas')
+
+    return render(request, 'cuentas/confirmar_cancelacion.html', {'reserva': reserva})
+
+# ========================
+# ADMIN: GESTIÓN DE USUARIOS
+# ========================
 
 @user_passes_test(es_admin)
 def gestionar_usuarios(request):
-    """
-    Vista exclusiva para el administrador. Muestra todos los usuarios del sistema.
-    Permite filtrar por nombre y rol.
-    """
     usuarios = CustomUser.objects.all()
-
     filtro_nombre = request.GET.get('nombre', '')
     filtro_rol = request.GET.get('rol', '')
 
     if filtro_nombre:
         usuarios = usuarios.filter(first_name__icontains=filtro_nombre)
-
     if filtro_rol:
         usuarios = usuarios.filter(rol__iexact=filtro_rol)
 
@@ -115,13 +140,10 @@ def gestionar_usuarios(request):
         'filtro_rol': filtro_rol,
     })
 
+
 @user_passes_test(es_admin)
 def editar_usuario(request, usuario_id):
-    """
-    Permite al administrador editar el rol de un usuario.
-    No permite modificar su propio rol.
-    """
-    usuario = CustomUser.objects.get(id=usuario_id)
+    usuario = get_object_or_404(CustomUser, id=usuario_id)
 
     if request.user == usuario:
         messages.error(request, "No podés modificar tu propio rol.")
@@ -140,14 +162,9 @@ def editar_usuario(request, usuario_id):
     return render(request, 'cuentas/editar_usuario.html', {'usuario': usuario})
 
 
-
 @user_passes_test(es_admin)
 def eliminar_usuario(request, usuario_id):
-    """
-    Permite al administrador eliminar un usuario del sistema.
-    Evita que se elimine a sí mismo.
-    """
-    usuario = CustomUser.objects.get(id=usuario_id)
+    usuario = get_object_or_404(CustomUser, id=usuario_id)
 
     if request.user == usuario:
         messages.error(request, "No podés eliminar tu propio usuario.")
@@ -160,10 +177,13 @@ def eliminar_usuario(request, usuario_id):
 
     return render(request, 'cuentas/eliminar_usuario.html', {'usuario': usuario})
 
-@user_passes_test(es_admin)
-def ver_todas_las_reservas(request):
-    reservas = Reserva.objects.all()
+# ========================
+# RESERVAS (ADMIN/RECEPCIONISTA)
+# ========================
 
+@user_passes_test(es_admin_o_recepcionista)
+def ver_todas_las_reservas(request):
+    reservas = Reserva.objects.all()  # Incluye activas e inactivas
     nombre = request.GET.get('nombre', '')
     contacto = request.GET.get('contacto', '')
     fecha = request.GET.get('fecha', '')
@@ -183,17 +203,61 @@ def ver_todas_las_reservas(request):
     })
 
 
-
-
 @user_passes_test(es_admin)
 def eliminar_reserva_admin(request, reserva_id):
-    """
-    Permite al admin eliminar cualquier reserva del sistema.
-    """
-    reserva = Reserva.objects.get(id=reserva_id)
+    reserva = get_object_or_404(Reserva, id=reserva_id)
     if request.method == 'POST':
         reserva.delete()
         messages.success(request, "Reserva eliminada correctamente.")
         return redirect('ver_todas_las_reservas')
-
     return render(request, 'cuentas/eliminar_reserva_admin.html', {'reserva': reserva})
+
+# ========================
+# MENÚ Y COMIDAS
+# ========================
+
+@login_required
+def menu_view(request):
+    menu = Comida.objects.all()
+    return render(request, 'cuentas/menu.html', {'menu': menu})
+
+
+@user_passes_test(es_admin)
+def gestionar_comidas(request):
+    comidas = Comida.objects.all()
+    return render(request, 'cuentas/gestionar_comidas.html', {'comidas': comidas})
+
+
+@user_passes_test(es_admin)
+def agregar_comida(request):
+    if request.method == 'POST':
+        form = ComidaForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Comida agregada correctamente.')
+            return redirect('gestionar_comidas')
+    else:
+        form = ComidaForm()
+    return render(request, 'cuentas/form_comida.html', {'form': form, 'accion': 'Agregar'})
+
+
+@user_passes_test(es_admin)
+def editar_comida(request, comida_id):
+    comida = get_object_or_404(Comida, id=comida_id)
+    if request.method == 'POST':
+        form = ComidaForm(request.POST, instance=comida)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Comida actualizada correctamente.')
+            return redirect('gestionar_comidas')
+    else:
+        form = ComidaForm(instance=comida)
+    return render(request, 'cuentas/form_comida.html', {'form': form, 'accion': 'Editar'})
+
+
+@user_passes_test(es_admin)
+def eliminar_comida(request, comida_id):
+    comida = get_object_or_404(Comida, id=comida_id)
+    comida.delete()
+    messages.success(request, 'Comida eliminada correctamente.')
+    return redirect('gestionar_comidas')

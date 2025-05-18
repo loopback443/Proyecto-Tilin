@@ -1,0 +1,29 @@
+<header>
+    <nav class="navbar">
+        <div class="nav-left">
+            <h1 class="logo">Asunción Gourmet</h1>
+            <ul class="nav-links">
+                {% if request.user.rol == "cliente" %}
+                    <li><a href="{% url 'inicio' %}">Inicio</a></li>
+                    <li><a class="nav-link" href="{% url 'menu' %}">Menú</a></li>
+                    <li><a href="#">Contacto</a></li>
+                    <li><a href="{% url 'mis_reservas' %}">Mis Reservas</a></li>
+                {% elif request.user.rol == "admin" %}
+                    <li><a href="{% url 'gestionar_usuarios' %}">Gestionar Restaurante</a></li>
+                {% endif %}
+                <!-- Cerrar sesión visible para todos -->
+                <li>
+                    <a href="{% url 'logout' %}" class="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        {% if request.user.rol != "recepcionista" %}
+        <div class="nav-user">
+            <span class="saludo">Hola, {{ usuario }} 👋</span>
+        </div>
+        {% endif %}
+    </nav>
+</header>
