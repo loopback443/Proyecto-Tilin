@@ -8,6 +8,9 @@
     <link rel="stylesheet" href="{% static 'cuentas/estilos.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
         table {
             width: 100%;
@@ -44,6 +47,41 @@
             padding: 30px;
             border-radius: 15px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin-top: 40px;
+        }
+
+        .acciones {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 0.85rem;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .btn-outline-primary {
+            color: #007bff;
+            border: 1px solid #007bff;
+        }
+
+        .btn-outline-danger {
+            color: #dc3545;
+            border: 1px solid #dc3545;
+        }
+
+        .btn-outline-primary:hover {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .btn-outline-danger:hover {
+            background-color: #dc3545;
+            color: white;
         }
     </style>
 </head>
@@ -75,6 +113,7 @@
                                 <th>Motivo</th>
                                 <th>Mesa</th>
                                 <th>Notas</th>
+                                <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -86,15 +125,49 @@
                                     <td>{{ reserva.get_motivo_display }}</td>
                                     <td>{% if reserva.mesa %}Mesa {{ reserva.mesa.numero }}{% else %}-{% endif %}</td>
                                     <td>{{ reserva.notas_adicionales|default:"-" }}</td>
+                                    <td class="acciones">
+                                        <a href="{% url 'editar_reserva' reserva.id %}" class="btn-sm btn-outline-primary">
+                                            ✏️ Editar
+                                        </a>
+
+                                        <!-- Formulario oculto para cancelar -->
+                                        <form id="form-cancelar-{{ reserva.id }}" action="{% url 'cancelar_reserva' reserva.id %}" method="POST" style="display: none;">
+                                            {% csrf_token %}
+                                        </form>
+                                        <a href="#" class="btn-sm btn-outline-danger"
+                                           onclick="confirmarCancelacion({{ reserva.id }}); return false;">
+                                            🗑️ Cancelar
+                                        </a>
+                                    </td>
                                 </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 {% else %}
-                    <p>No tenés reservas registradas.</p>
+                    <p class="text-muted">No tenés reservas activas.</p>
                 {% endif %}
             </div>
         </section>
     </main>
+
+    <!-- Confirmación SweetAlert2 -->
+    <script>
+        function confirmarCancelacion(reservaId) {
+            Swal.fire({
+                title: '¿Cancelar reserva?',
+                text: 'Esta acción no se puede deshacer.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#aaa',
+                confirmButtonText: 'Sí, cancelar',
+                cancelButtonText: 'No'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('form-cancelar-' + reservaId).submit();
+                }
+            });
+        }
+    </script>
 </body>
 </html>

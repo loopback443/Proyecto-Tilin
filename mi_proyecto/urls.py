@@ -1,7 +1,7 @@
 from django.contrib import admin
-from django.urls import path, include  # 👈 esto es clave
+from django.urls import path, include 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('cuentas.urls')),  # 👈 conecta con las URLs de tu app
+    path('', include('cuentas.urls')),  
 ]

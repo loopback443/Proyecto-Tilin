@@ -1,15 +1,18 @@
-# generate_docs.py
 import os
+import sys
+from pathlib import Path
 import django
 import pdoc
-from pathlib import Path  # ✅ Importación necesaria
 
-# Establece el módulo de configuración
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mi_proyecto.settings")
-os.environ.setdefault("PYTHONPATH", ".")
+# Configurar entorno de Django
+os.environ["DJANGO_SETTINGS_MODULE"] = "mi_proyecto.settings"
+sys.path.insert(0, os.path.abspath("."))
 
-# Inicializa Django
+# Iniciar Django
 django.setup()
 
-# Genera la documentación para la app 'cuentas'
-pdoc.pdoc("cuentas", output_directory=Path("cuentas/docs"))
+# Módulos a documentar
+modules = ["cuentas.views", "cuentas.forms", "cuentas.urls"]
+
+# Generar documentación
+pdoc.pdoc(*modules, output_directory=Path("docs"))

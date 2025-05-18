@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import CustomUser, Reserva
+from .models import CustomUser, Reserva, Comida
 
 class RegistroUsuarioForm(UserCreationForm):
     """
@@ -17,6 +17,7 @@ class RegistroUsuarioForm(UserCreationForm):
         model = CustomUser
         fields = ['first_name', 'last_name', 'email', 'password1', 'password2']
 
+
 class ReservaForm(forms.ModelForm):
     """
     Formulario para realizar reservas.
@@ -27,3 +28,20 @@ class ReservaForm(forms.ModelForm):
     class Meta:
         model = Reserva
         exclude = ['cliente']
+
+
+class ComidaForm(forms.ModelForm):
+    """
+    Formulario para agregar o editar comidas del menú.
+
+    Basado en el modelo Comida, incluye los campos:
+    - nombre
+    - precio
+    """
+    class Meta:
+        model = Comida
+        fields = ['nombre', 'precio']
+        widgets = {
+            'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+            'precio': forms.NumberInput(attrs={'class': 'form-control'}),
+        }
