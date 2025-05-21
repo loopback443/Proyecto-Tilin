@@ -1,4 +1,4 @@
-/* Estilos generales */
+/* Estilos generales del menu del restaurante */
 body {
     font-family: 'Roboto', sans-serif;
     margin: 0;
@@ -6,7 +6,6 @@ body {
     color: #333;
     line-height: 1.6;
 }
-#contenedor
 .container {
     max-width: 1200px;
     margin: 0 auto;
