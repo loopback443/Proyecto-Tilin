@@ -6,12 +6,12 @@ body {
     color: #333;
     line-height: 1.6;
 }
-
+#contenedor
 .container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
-}
+} 
 
 /* Hero section */
 .hero {
