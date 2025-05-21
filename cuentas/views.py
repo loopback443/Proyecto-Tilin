@@ -10,9 +10,15 @@ from .models import Reserva, CustomUser, Comida
 # ========================
 
 def es_admin(user):
+    """
+    Verifica si el usuario tiene el rol de administrador.
+    """
     return user.is_authenticated and user.rol == 'admin'
 
 def es_admin_o_recepcionista(user):
+    """
+    Verifica si el usuario tiene rol de administrador o recepcionista.
+    """
     return user.is_authenticated and user.rol in ['admin', 'recepcionista']
 
 # ========================
@@ -20,6 +26,10 @@ def es_admin_o_recepcionista(user):
 # ========================
 
 def login_view(request):
+    """
+    Vista de inicio de sesión.
+    Autentica al usuario por correo y contraseña y redirige según el rol.
+    """
     if request.method == 'POST':
         email = request.POST.get("email")
         password = request.POST.get("password")
@@ -37,8 +47,10 @@ def login_view(request):
             messages.error(request, "Correo o contraseña incorrectos.")
     return render(request, 'cuentas/login.html')
 
-
 def register_view(request):
+    """
+    Vista de registro de nuevos usuarios usando RegistroUsuarioForm.
+    """
     if request.method == 'POST':
         form = RegistroUsuarioForm(request.POST)
         if form.is_valid():
@@ -51,8 +63,10 @@ def register_view(request):
         form = RegistroUsuarioForm()
     return render(request, 'cuentas/register.html', {'form': form})
 
-
 def logout_view(request):
+    """
+    Cierra sesión del usuario y redirige al login.
+    """
     logout(request)
     return redirect('login')
 
@@ -62,11 +76,16 @@ def logout_view(request):
 
 @login_required
 def index_view(request):
+    """
+    Página de inicio luego del login para usuarios autenticados.
+    """
     return render(request, 'cuentas/index.html', {'usuario': request.user.first_name})
-
 
 @login_required
 def hacer_reserva(request):
+    """
+    Permite al cliente registrar una nueva reserva.
+    """
     if request.method == 'POST':
         reserva = Reserva(
             cliente=request.user,
@@ -84,15 +103,19 @@ def hacer_reserva(request):
         return redirect('inicio')
     return redirect('inicio')
 
-
 @login_required
 def mis_reservas(request):
+    """
+    Muestra todas las reservas activas del cliente logueado.
+    """
     reservas = request.user.reserva_set.filter(activa=True)
     return render(request, 'cuentas/mis_reservas.html', {'reservas': reservas})
 
-
 @login_required
 def editar_reserva(request, reserva_id):
+    """
+    Permite al cliente editar una reserva activa propia.
+    """
     reserva = get_object_or_404(Reserva, id=reserva_id, cliente=request.user, activa=True)
 
     if request.method == 'POST':
@@ -106,9 +129,11 @@ def editar_reserva(request, reserva_id):
 
     return render(request, 'cuentas/form_reserva.html', {'form': form, 'accion': 'Editar'})
 
-
 @login_required
 def cancelar_reserva(request, reserva_id):
+    """
+    Cancela lógicamente una reserva (marcándola como inactiva).
+    """
     reserva = get_object_or_404(Reserva, id=reserva_id, cliente=request.user, activa=True)
 
     if request.method == 'POST':
@@ -125,6 +150,9 @@ def cancelar_reserva(request, reserva_id):
 
 @user_passes_test(es_admin)
 def gestionar_usuarios(request):
+    """
+    Vista para que el administrador filtre y gestione usuarios por nombre o rol.
+    """
     usuarios = CustomUser.objects.all()
     filtro_nombre = request.GET.get('nombre', '')
     filtro_rol = request.GET.get('rol', '')
@@ -140,9 +168,11 @@ def gestionar_usuarios(request):
         'filtro_rol': filtro_rol,
     })
 
-
 @user_passes_test(es_admin)
 def editar_usuario(request, usuario_id):
+    """
+    Permite al admin cambiar el rol de otros usuarios.
+    """
     usuario = get_object_or_404(CustomUser, id=usuario_id)
 
     if request.user == usuario:
@@ -161,9 +191,11 @@ def editar_usuario(request, usuario_id):
 
     return render(request, 'cuentas/editar_usuario.html', {'usuario': usuario})
 
-
 @user_passes_test(es_admin)
 def eliminar_usuario(request, usuario_id):
+    """
+    Elimina del sistema a un usuario distinto al admin autenticado.
+    """
     usuario = get_object_or_404(CustomUser, id=usuario_id)
 
     if request.user == usuario:
@@ -183,7 +215,10 @@ def eliminar_usuario(request, usuario_id):
 
 @user_passes_test(es_admin_o_recepcionista)
 def ver_todas_las_reservas(request):
-    reservas = Reserva.objects.all()  # Incluye activas e inactivas
+    """
+    Muestra todas las reservas del sistema con filtros por nombre, contacto o fecha.
+    """
+    reservas = Reserva.objects.all()
     nombre = request.GET.get('nombre', '')
     contacto = request.GET.get('contacto', '')
     fecha = request.GET.get('fecha', '')
@@ -202,9 +237,11 @@ def ver_todas_las_reservas(request):
         'filtro_fecha': fecha,
     })
 
-
 @user_passes_test(es_admin)
 def eliminar_reserva_admin(request, reserva_id):
+    """
+    Elimina físicamente una reserva del sistema (solo el administrador puede hacerlo).
+    """
     reserva = get_object_or_404(Reserva, id=reserva_id)
     if request.method == 'POST':
         reserva.delete()
@@ -218,18 +255,25 @@ def eliminar_reserva_admin(request, reserva_id):
 
 @login_required
 def menu_view(request):
+    """
+    Muestra el menú de comidas disponible a todos los usuarios autenticados.
+    """
     menu = Comida.objects.all()
     return render(request, 'cuentas/menu.html', {'menu': menu})
 
-
 @user_passes_test(es_admin)
 def gestionar_comidas(request):
+    """
+    Permite al administrador visualizar todas las comidas registradas.
+    """
     comidas = Comida.objects.all()
     return render(request, 'cuentas/gestionar_comidas.html', {'comidas': comidas})
 
-
 @user_passes_test(es_admin)
 def agregar_comida(request):
+    """
+    Permite al administrador agregar una nueva comida al sistema.
+    """
     if request.method == 'POST':
         form = ComidaForm(request.POST)
         if form.is_valid():
@@ -240,9 +284,11 @@ def agregar_comida(request):
         form = ComidaForm()
     return render(request, 'cuentas/form_comida.html', {'form': form, 'accion': 'Agregar'})
 
-
 @user_passes_test(es_admin)
 def editar_comida(request, comida_id):
+    """
+    Permite al administrador modificar los datos de una comida existente.
+    """
     comida = get_object_or_404(Comida, id=comida_id)
     if request.method == 'POST':
         form = ComidaForm(request.POST, instance=comida)
@@ -254,9 +300,11 @@ def editar_comida(request, comida_id):
         form = ComidaForm(instance=comida)
     return render(request, 'cuentas/form_comida.html', {'form': form, 'accion': 'Editar'})
 
-
 @user_passes_test(es_admin)
 def eliminar_comida(request, comida_id):
+    """
+    Permite al administrador eliminar una comida registrada en el sistema.
+    """
     comida = get_object_or_404(Comida, id=comida_id)
     comida.delete()
     messages.success(request, 'Comida eliminada correctamente.')
