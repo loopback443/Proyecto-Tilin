@@ -12,7 +12,7 @@ sys.path.insert(0, os.path.abspath("."))
 django.setup()
 
 # Módulos a documentar
-modules = ["cuentas.views", "cuentas.forms", "cuentas.urls"]
+modules = ["cuentas.views", "cuentas.forms", "cuentas.urls","cuentas.models","cuentas.admin","cuentas.backend"]
 
 # Generar documentación
 pdoc.pdoc(*modules, output_directory=Path("docs"))

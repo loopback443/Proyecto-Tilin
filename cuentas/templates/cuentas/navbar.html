@@ -1,29 +1,44 @@
 <header>
-    <nav class="navbar">
-        <div class="nav-left">
-            <h1 class="logo">Asunción Gourmet</h1>
-            <ul class="nav-links">
-                {% if request.user.rol == "cliente" %}
-                    <li><a href="{% url 'inicio' %}">Inicio</a></li>
-                    <li><a class="nav-link" href="{% url 'menu' %}">Menú</a></li>
-                    <li><a href="#">Contacto</a></li>
-                    <li><a href="{% url 'mis_reservas' %}">Mis Reservas</a></li>
-                {% elif request.user.rol == "admin" %}
-                    <li><a href="{% url 'gestionar_usuarios' %}">Gestionar Restaurante</a></li>
-                {% endif %}
-                <!-- Cerrar sesión visible para todos -->
-                <li>
-                    <a href="{% url 'logout' %}" class="logout-btn">
-                        <i class="fas fa-sign-out-alt"></i> Cerrar sesión
-                    </a>
-                </li>
-            </ul>
-        </div>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom shadow-sm px-4">
+    <a class="navbar-brand text-warning fw-bold" href="{% url 'inicio' %}">Asunción Gourmet</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
 
-        {% if request.user.rol != "recepcionista" %}
-        <div class="nav-user">
-            <span class="saludo">Hola, {{ usuario }} 👋</span>
-        </div>
+    <div class="collapse navbar-collapse justify-content-between" id="navbarContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        {% if request.user.rol != "admin" %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'inicio' %}">Inicio</a>
+          </li>
         {% endif %}
-    </nav>
+        {% if request.user.rol == "cliente" %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'menu' %}">Menú</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Contacto</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'mis_reservas' %}">Mis Reservas</a>
+          </li>
+        {% elif request.user.rol == "recepcionista" %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'ver_todas_las_reservas' %}">Reservas</a>
+          </li>
+        {% endif %}
+      </ul>
+
+      <ul class="navbar-nav mb-2 mb-lg-0">
+        <li class="nav-item me-2 d-flex align-items-center">
+          <span class="navbar-text text-dark">Hola, {{ usuario }} 👋</span>
+        </li>
+        <li class="nav-item">
+          <a class="btn btn-warning text-white fw-bold" href="{% url 'logout' %}">
+            <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nav>
 </header>
