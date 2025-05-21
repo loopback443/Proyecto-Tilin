@@ -4,6 +4,9 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .forms import ReservaForm, RegistroUsuarioForm, ComidaForm
 from .models import Reserva, CustomUser, Comida
+from django.http import HttpResponseForbidden
+
+
 
 # ========================
 # FUNCIONES AUXILIARES
@@ -79,6 +82,8 @@ def index_view(request):
     """
     Página de inicio luego del login para usuarios autenticados.
     """
+    if request.user.rol == 'recepcionista':
+        return redirect('ver_todas_las_reservas')
     return render(request, 'cuentas/index.html', {'usuario': request.user.first_name})
 
 @login_required
@@ -148,11 +153,17 @@ def cancelar_reserva(request, reserva_id):
 # ADMIN: GESTIÓN DE USUARIOS
 # ========================
 
-@user_passes_test(es_admin)
+
+
+@login_required
 def gestionar_usuarios(request):
     """
     Vista para que el administrador filtre y gestione usuarios por nombre o rol.
+    Devuelve 403 si el usuario no tiene permiso.
     """
+    if request.user.rol != 'admin':
+        return HttpResponseForbidden("Acceso denegado.")
+
     usuarios = CustomUser.objects.all()
     filtro_nombre = request.GET.get('nombre', '')
     filtro_rol = request.GET.get('rol', '')
@@ -167,6 +178,7 @@ def gestionar_usuarios(request):
         'filtro_nombre': filtro_nombre,
         'filtro_rol': filtro_rol,
     })
+
 
 @user_passes_test(es_admin)
 def editar_usuario(request, usuario_id):
@@ -261,19 +273,29 @@ def menu_view(request):
     menu = Comida.objects.all()
     return render(request, 'cuentas/menu.html', {'menu': menu})
 
-@user_passes_test(es_admin)
+@login_required
 def gestionar_comidas(request):
     """
     Permite al administrador visualizar todas las comidas registradas.
+    Devuelve 403 si el usuario no tiene permiso.
     """
+    if request.user.rol != 'admin':
+        return HttpResponseForbidden("Acceso denegado.")
+
     comidas = Comida.objects.all()
     return render(request, 'cuentas/gestionar_comidas.html', {'comidas': comidas})
 
-@user_passes_test(es_admin)
+
+
+@login_required
 def agregar_comida(request):
     """
     Permite al administrador agregar una nueva comida al sistema.
+    Devuelve 403 si el usuario no tiene permiso.
     """
+    if request.user.rol != 'admin':
+        return HttpResponseForbidden("Acceso denegado.")
+
     if request.method == 'POST':
         form = ComidaForm(request.POST)
         if form.is_valid():
@@ -284,11 +306,16 @@ def agregar_comida(request):
         form = ComidaForm()
     return render(request, 'cuentas/form_comida.html', {'form': form, 'accion': 'Agregar'})
 
-@user_passes_test(es_admin)
+
+@login_required
 def editar_comida(request, comida_id):
     """
     Permite al administrador modificar los datos de una comida existente.
+    Devuelve 403 si el usuario no es administrador.
     """
+    if request.user.rol != 'admin':
+        return HttpResponseForbidden("Acceso denegado.")
+
     comida = get_object_or_404(Comida, id=comida_id)
     if request.method == 'POST':
         form = ComidaForm(request.POST, instance=comida)
@@ -300,11 +327,16 @@ def editar_comida(request, comida_id):
         form = ComidaForm(instance=comida)
     return render(request, 'cuentas/form_comida.html', {'form': form, 'accion': 'Editar'})
 
-@user_passes_test(es_admin)
+
+@login_required
 def eliminar_comida(request, comida_id):
     """
     Permite al administrador eliminar una comida registrada en el sistema.
+    Devuelve 403 si el usuario no es administrador.
     """
+    if request.user.rol != 'admin':
+        return HttpResponseForbidden("Acceso denegado.")
+
     comida = get_object_or_404(Comida, id=comida_id)
     comida.delete()
     messages.success(request, 'Comida eliminada correctamente.')
