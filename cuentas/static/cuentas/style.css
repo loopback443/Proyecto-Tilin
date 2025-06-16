@@ -144,6 +144,7 @@ body {
     border-radius: 25px;
     cursor: pointer;
     transition: background 0.3s ease;
+    text-decoration: none;
 }
 
 .reserve-btn:hover {
