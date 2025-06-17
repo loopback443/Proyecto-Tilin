@@ -225,15 +225,18 @@ def eliminar_usuario(request, usuario_id):
 # RESERVAS (ADMIN/RECEPCIONISTA)
 # ========================
 
+
 @user_passes_test(es_admin_o_recepcionista)
 def ver_todas_las_reservas(request):
     """
-    Muestra todas las reservas del sistema con filtros por nombre, contacto o fecha.
+    Muestra todas las reservas del sistema con filtros por nombre, contacto, fecha y estado (activa/cancelada).
+    Por defecto, muestra solo las reservas activas.
     """
     reservas = Reserva.objects.all()
     nombre = request.GET.get('nombre', '')
     contacto = request.GET.get('contacto', '')
     fecha = request.GET.get('fecha', '')
+    activa = request.GET.get('activa', '1')  # por defecto solo activas
 
     if nombre:
         reservas = reservas.filter(cliente__first_name__icontains=nombre)
@@ -241,12 +244,15 @@ def ver_todas_las_reservas(request):
         reservas = reservas.filter(nombre_contacto__icontains=contacto)
     if fecha:
         reservas = reservas.filter(fecha=fecha)
+    if activa in ['0', '1']:
+        reservas = reservas.filter(activa=bool(int(activa)))
 
     return render(request, 'cuentas/ver_todas_las_reservas.html', {
         'reservas': reservas,
         'filtro_nombre': nombre,
         'filtro_contacto': contacto,
         'filtro_fecha': fecha,
+        'filtro_activa': activa,
     })
 
 @user_passes_test(es_admin)

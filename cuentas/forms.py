@@ -27,7 +27,8 @@ class ReservaForm(forms.ModelForm):
     """
     class Meta:
         model = Reserva
-        exclude = ['cliente']
+        exclude = ['cliente', 'mesa']
+
 
 
 class ComidaForm(forms.ModelForm):

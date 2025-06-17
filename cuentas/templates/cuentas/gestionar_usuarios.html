@@ -38,8 +38,8 @@
                     <td>{{ usuario.rol }}</td>
                     <td>
                         {% if usuario != request.user %}
-                        <a href="{% url 'editar_usuario' usuario.id %}" class="reserve-btn" style="background-color: #007bff;">Editar</a>
-                        <a href="{% url 'eliminar_usuario' usuario.id %}" class="reserve-btn" style="background-color: #dc3545;">Eliminar</a>
+                        <a href="{% url 'editar_usuario' usuario.id %}" class="reserve-btn" style="background-color: #007bff; display: inline-block; margin-bottom: 6px;">Editar</a><br>
+                        <a href="{% url 'eliminar_usuario' usuario.id %}" class="reserve-btn" style="background-color: #dc3545; display: inline-block;">Eliminar</a>
                         {% else %}
                         <span style="color: #888;">No podés modificar tu propio rol</span>
                         {% endif %}
